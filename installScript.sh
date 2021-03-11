@@ -1,5 +1,4 @@
 #!/bin/bash
-RED="\033[1;31m"
 http(){
 	sudo apt-get install apache2
 	sudo ufw allow 'Apache Full'
