@@ -1,5 +1,5 @@
 #!/bin/bash
-
+RED="\033[1;31m"
 http(){
 	sudo apt-get install apache2
 	sudo ufw allow 'Apache Full'
@@ -29,42 +29,42 @@ dhcp(){
 }
 while  true
 do
-	echo "#####################################"
-	echo "#    Welcome to Installer Script    #"
-	echo "#####################################"
+	echo -e "\e[33m#####################################################\e[0m"
+	echo -e "\e[33m#\e[0m            \e[38;5;41mWelcome to Installer Script\e[0m            \e[33m#"
+	echo -e "\e[33m#####################################################\e[0m"
 	echo " "
-	echo "Please select your option-"
-	echo "1) install HTTP"
-	echo "2) install FTP"
-	echo "3) install SSH"
-	echo "4) install DHCP"
-	echo "5) Exit the installer script"
+	echo -e  "\e[38;5;32m#Author: Jitul#\e[0m"
+	echo " "	
+	echo " " 
+	echo -e "\e[31mPlease select your option-\e[0m"
+	echo " " 
+	echo -e "\e[34m1) install HTTP\e[0m"
+	echo -e "\e[32m2) install FTP\e[0m"
+	echo -e "\e[36m3) install SSH\e[0m"
+	echo -e "\e[95m4) install DHCP\e[0m"
+	echo -e "\e[96m5) Exit the installer script\e[0m"
+	echo " " 
 	read option
 	
 	case "$option" in
-		1)echo "HTTP installation selected."
-		echo "Please wait, processing your installation..."
+		1)echo -e "\e[31mHTTP installation selected.\nPlease wait, processing your installation...\e[0m"
 		http
 		
 		;;
-		2)echo "FTP installation selected."
-                echo "Please wait, processing your installation..."
+		2)echo -e "\e[31mFTP installation selected.\nPlease wait, processing your installation...\e[0m"
                 ftp
                 ;;
-		3)echo "SSH installation selected."
-                echo "Please wait, processing your installation..."
+		3)echo -e "\e[31mSSH installation selected.\nPlease wait, processing your installation...\e[0m"
                 ssh
                 ;;
-		4)echo "DHCP installation selected."
-                echo "Please wait, processing your installation..."
+		4)echo -e "\e[31mDHCP installation selected.\nPlease wait, processing your installation...\e[0m"
                 dhcp
                 ;;
-		5)echo "Exit option selected."
-                echo "Exiting, Please wait..."
+		5)echo -e "\e[31mExit option selected.\nExiting, Please wait...\e[0m"
                 exit 0
                 ;;
 		*)
-                echo "Invalid selection, please try again."
+                echo -e "\e[31mInvalid selection, please try again.\e[0m"
                 
                 ;;
 	esac
