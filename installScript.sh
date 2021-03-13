@@ -1,40 +1,43 @@
 #!/bin/bash
+update(){
+	sudo apt-get update -y && apt-get upgrade
+	}
 http(){
 	if ! grep -q "^deb .*$the_ppa" /etc/apt/sources.list /etc/apt/sources.list.d/*; then
     		sudo add-apt-repository ppa:ondrej/apache2 -y
-		sudo apt-get update -y
+		update
 	fi
-	sudo apt-get install apache2 -y
-	sudo ufw allow 'Apache Full' -y
-	sudo systemctl start apache2.service -y
+	apt-get install apache2 -y
+	ufw allow 'Apache Full' 
+	systemctl start apache2.service
 }
 
 ftp(){
-	sudo apt-get update -y
+	update
 	sudo cp /etc/vsftpd.conf /etc/conf_default -y
-	sudo touch /etc/vsftpd.conf
-	sudo apt-get install vsftpd -y
-	systemctl start vsftpd 
+	touch /etc/vsftpd.conf
+	apt-get install vsftpd -y
+	systemctl start vsftpd
 	systemctl enable vsftpd
-	sudo useradd -m testuser
-	sudo password testuser
-	sudo mkdir /home/testuser
-	sudo ufw allow 20/tcp 
-	sudo ufw allow 21/tcp
-	VAL="YES"
-	sudo sed -i '/write_enable/ s/NO/YES' /etc/vsftpd.conf
+	useradd -m testuser
+	password testuser
+	mkdir /home/testuser
+	ufw allow 20/tcp
+	ufw allow 21/tcp
+	sed -i '/write_enable/ s/NO/YES' /etc/vsftpd.conf
 	systemctl restart vsftpd
 	echo "Installation Done"
 }
-ssh(){
-	sudo apt-get install openssh-server
-	sudo systemctl enable ssh
-	sudo systemctl start ssh
-	sudo ufw allow ssh
+ssh(){	update
+	apt-get install openssh-server
+	systemctl enable ssh
+	systemctl start ssh
+	ufw allow ssh
 }
-dhcp(){
-	sudo apt-get install isc-dhcp-server
-	
+dhcp(){ update
+	apt-get install isc-dhcp-server -y
+
+
 }
 while  true
 do
@@ -43,22 +46,22 @@ do
 	echo -e "\e[33m#####################################################\e[0m"
 	echo " "
 	echo -e  "\e[38;5;32m#Author: Jitul#\e[0m"
-	echo " "	
-	echo " " 
+	echo " "
+	echo " "
 	echo -e "\e[31mPlease select your option-\e[0m"
-	echo " " 
+	echo " "
 	echo -e "\e[34m1) Install HTTP\e[0m"
 	echo -e "\e[32m2) Install FTP\e[0m"
 	echo -e "\e[36m3) Install SSH\e[0m"
 	echo -e "\e[95m4) Install DHCP\e[0m"
 	echo -e "\e[96m5) Exit the installer script\e[0m"
-	echo " " 
+	echo " "
 	read option
-	
+
 	case "$option" in
 		1)echo -e "\e[31mHTTP installation selected.\nPlease wait, processing your installation...\e[0m"
 		http
-		
+
 		;;
 		2)echo -e "\e[31mFTP installation selected.\nPlease wait, processing your installation...\e[0m"
                 ftp
