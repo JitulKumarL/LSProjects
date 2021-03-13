@@ -22,7 +22,7 @@ ftp(){
 	sudo ufw allow 20/tcp 
 	sudo ufw allow 21/tcp
 	VAL="YES"
-	sudo sed -i "s/^\(write\_enable\s*=\s*\).*\$/\1$VAL/" /etc/vsftpd.conf
+	sudo sed -i '/write_enable/ s/NO/YES' /etc/vsftpd.conf
 	systemctl restart vsftpd
 	echo "Installation Done"
 }
