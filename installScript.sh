@@ -1,18 +1,28 @@
 #!/bin/bash
 http(){
-	sudo apt-get install apache2
-	sudo ufw allow 'Apache Full'
-	sudo systemctl start apache2.service
+	if ! grep -q "^deb .*$the_ppa" /etc/apt/sources.list /etc/apt/sources.list.d/*; then
+    		sudo add-apt-repository ppa:ondrej/apache2 -y
+		sudo apt-get update -y
+	fi
+	sudo apt-get install apache2 -y
+	sudo ufw allow 'Apache Full' -y
+	sudo systemctl start apache2.service -y
 }
 
 ftp(){
-	sudo apt-get install vsftpd
-	systemctl start vsftpd
+	sudo apt-get update -y
+	sudo cp /etc/vsftpd.conf /etc/conf_default -y
+	sudo touch /etc/vsftpd.conf
+	sudo apt-get install vsftpd -y
+	systemctl start vsftpd 
 	systemctl enable vsftpd
-	sudo ufw allow 20/tcp
+	sudo useradd -m testuser
+	sudo password testuser
+	sudo mkdir /home/testuser
+	sudo ufw allow 20/tcp 
 	sudo ufw allow 21/tcp
-	sudo cp /etc/vsftpd.conf /etc/vsftpd.conf.orig
-	sudo nano /etc/vsftpd.conf
+	VAL="YES"
+	sudo sed -i "s/^\(write\_enable\s*=\s*\).*\$/\1$VAL/" /etc/vsftpd.conf
 	systemctl restart vsftpd
 	echo "Installation Done"
 }
