@@ -14,19 +14,29 @@ http(){
 
 ftp(){
 	update
-	sudo cp /etc/vsftpd.conf /etc/conf_default -y
-	touch /etc/vsftpd.conf
+	sudo cp /etc/vsftpd.conf /etc/conf_default
+	#touch /etc/vsftpd.conf
 	apt-get install vsftpd -y
 	systemctl start vsftpd
 	systemctl enable vsftpd
-	useradd -m testuser
-	password testuser
-	mkdir /home/testuser
+
+	echo "Enter Username to configure:" 
+	read UNAME
+	sudo useradd -m -c $UNAME -s /bin/bash $UNAME
+	echo "Enter Password for "$UNAME:""
+	read PWD
+	sudo passwd $PWD
+
+#	useradd -m  testuser
+#	password  testuser
+	mkdir /home/$UNAME
 	ufw allow 20/tcp
 	ufw allow 21/tcp
 	sed -i '/write_enable/ s/NO/YES' /etc/vsftpd.conf
 	systemctl restart vsftpd
 	echo "Installation Done"
+#	echo "Test username is: testuser"
+#	echo "Test login password is: testuser"
 }
 ssh(){	update
 	apt-get install openssh-server
@@ -36,7 +46,16 @@ ssh(){	update
 }
 dhcp(){ update
 	apt-get install isc-dhcp-server -y
-
+	echo "Enter Domain Name to be configured"
+	read DOMAIN_NAME
+	echo "Enter Name-Server1"
+	read NS1
+	echo "Enter Name-Server2"
+	read NS2
+	sed -i '/option domain-name/ s/example.org/'$DOMAIN_NAME/ /etc/dhcp/dhcpd.conf
+	sed -i '/option domain-name-servers/ s/ns1.example.org/'$NS1/ /etc/dhcp/dhcpd.conf
+	sed -i '/option domain-name-servers/ s/ns1.example.org/'$NS2/ /etc/dhcp/dhcpd.conf
+	sed -i '/#authoritative/ s/#authoritative/authoritative/' /etc/dhcp/dhcpd.conf
 
 }
 while  true
