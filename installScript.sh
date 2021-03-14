@@ -1,30 +1,65 @@
 #!/bin/bash
+<<<<<<< HEAD
+=======
+update(){
+	sudo apt-get update -y && apt-get upgrade
+	}
+>>>>>>> test
 http(){
-	sudo apt-get install apache2
-	sudo ufw allow 'Apache Full'
-	sudo systemctl start apache2.service
+	if ! grep -q "^deb .*$the_ppa" /etc/apt/sources.list /etc/apt/sources.list.d/*; then
+    		sudo add-apt-repository ppa:ondrej/apache2 -y
+		update
+	fi
+	apt-get install apache2 -y
+	ufw allow 'Apache Full' 
+	systemctl start apache2.service
 }
 
 ftp(){
-	sudo apt-get install vsftpd
+	update
+	sudo cp /etc/vsftpd.conf /etc/conf_default
+	#touch /etc/vsftpd.conf
+	apt-get install vsftpd -y
 	systemctl start vsftpd
 	systemctl enable vsftpd
-	sudo ufw allow 20/tcp
-	sudo ufw allow 21/tcp
-	sudo cp /etc/vsftpd.conf /etc/vsftpd.conf.orig
-	sudo nano /etc/vsftpd.conf
+
+	echo "Enter Username to configure:" 
+	read UNAME
+	sudo useradd -m -c $UNAME -s /bin/bash $UNAME
+	echo "Enter Password for "$UNAME:""
+	read PWD
+	sudo passwd $PWD
+
+#	useradd -m  testuser
+#	password  testuser
+	mkdir /home/$UNAME
+	ufw allow 20/tcp
+	ufw allow 21/tcp
+	sed -i '/write_enable/ s/NO/YES' /etc/vsftpd.conf
 	systemctl restart vsftpd
 	echo "Installation Done"
+#	echo "Test username is: testuser"
+#	echo "Test login password is: testuser"
 }
-ssh(){
-	sudo apt-get install openssh-server
-	sudo systemctl enable ssh
-	sudo systemctl start ssh
-	sudo ufw allow ssh
+ssh(){	update
+	apt-get install openssh-server
+	systemctl enable ssh
+	systemctl start ssh
+	ufw allow ssh
 }
-dhcp(){
-	sudo apt-get install isc-dhcp-server
-	
+dhcp(){ update
+	apt-get install isc-dhcp-server -y
+	echo "Enter Domain Name to be configured"
+	read DOMAIN_NAME
+	echo "Enter Name-Server1"
+	read NS1
+	echo "Enter Name-Server2"
+	read NS2
+	sed -i '/option domain-name/ s/example.org/'$DOMAIN_NAME/ /etc/dhcp/dhcpd.conf
+	sed -i '/option domain-name-servers/ s/ns1.example.org/'$NS1/ /etc/dhcp/dhcpd.conf
+	sed -i '/option domain-name-servers/ s/ns1.example.org/'$NS2/ /etc/dhcp/dhcpd.conf
+	sed -i '/#authoritative/ s/#authoritative/authoritative/' /etc/dhcp/dhcpd.conf
+
 }
 while  true
 do
@@ -33,22 +68,22 @@ do
 	echo -e "\e[33m#####################################################\e[0m"
 	echo " "
 	echo -e  "\e[38;5;32m#Author: Jitul#\e[0m"
-	echo " "	
-	echo " " 
+	echo " "
+	echo " "
 	echo -e "\e[31mPlease select your option-\e[0m"
-	echo " " 
-	echo -e "\e[34m1) install HTTP\e[0m"
-	echo -e "\e[32m2) install FTP\e[0m"
-	echo -e "\e[36m3) install SSH\e[0m"
-	echo -e "\e[95m4) install DHCP\e[0m"
+	echo " "
+	echo -e "\e[34m1) Install HTTP\e[0m"
+	echo -e "\e[32m2) Install FTP\e[0m"
+	echo -e "\e[36m3) Install SSH\e[0m"
+	echo -e "\e[95m4) Install DHCP\e[0m"
 	echo -e "\e[96m5) Exit the installer script\e[0m"
-	echo " " 
+	echo " "
 	read option
-	
+
 	case "$option" in
 		1)echo -e "\e[31mHTTP installation selected.\nPlease wait, processing your installation...\e[0m"
 		http
-		
+
 		;;
 		2)echo -e "\e[31mFTP installation selected.\nPlease wait, processing your installation...\e[0m"
                 ftp
