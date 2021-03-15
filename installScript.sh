@@ -60,19 +60,62 @@ ssh(){	update
 	ufw allow ssh
 }
 dhcp(){ update
+	apt-get install net-tools
 	apt-get install isc-dhcp-server -y
+	ifconfig
+	echo "Enter the interface for listening DHCP requests:"
+        read INTERFACE
+        sed -i -e 's/INTERFACESv4=""/INTERFACESv4="'"$INTERFACE"'"/' /etc/default/isc-dhcp-server
+
+
 	echo "Enter Domain Name to be configured"
 	read DOMAIN_NAME
-	echo "Enter Name-Server1"
+	echo "Enter Name-Server1 IP Address:"
 	read NS1
-	echo "Enter Name-Server2"
+	echo "Enter Name-Server2 IP Address"
 	read NS2
-	sed -i '/option domain-name/ s/example.org/'$DOMAIN_NAME/ /etc/dhcp/dhcpd.conf
-	sed -i '/option domain-name-servers/ s/ns1.example.org/'$NS1/ /etc/dhcp/dhcpd.conf
-	sed -i '/option domain-name-servers/ s/ns1.example.org/'$NS2/ /etc/dhcp/dhcpd.conf
-	sed -i '/#authoritative/ s/#authoritative/authoritative/' /etc/dhcp/dhcpd.conf
+	sed -i '10s/.*/option domain-name "'"$DOMAIN_NAME"'";/' /etc/dhcp/dhcpd.conf
+	sed -i '11s/.*/option domain-name-servers '$NS1','$NS2';/' /etc/dhcp/dhcpd.conf
+	sed -i '24s/#authoritative/authoritative/' /etc/dhcp/dhcpd.conf
+	echo "Enter subnet:"
+	read SUBNET
+	echo "Enter netmask:"
+	read NETMASK
+	sed -i '53s/.*/subnet '$SUBNET' netmask '$NETMASK' {/' /etc/dhcp/dhcpd.conf
+	echo "Enter Range- Start IP:"
+	read RANGE1
+	echo "Enter Range- Last IP:"
+	read RANGE2
+	sed -i '54s/.*/  range '$RANGE1' '$RANGE2';/' /etc/dhcp/dhcpd.conf
+	echo "Enter Internal Domain name server ip:"
+	read NSI1
+	sed -i '55s/.*/  option domain-name-servers '$NSI1';/' /etc/dhcp/dhcpd.conf
+	echo "Enter internal DNS:"
+	read IDN
+	sed -i '56s/.*/  option domain-name "'"$IDN"'";/' /etc/dhcp/dhcpd.conf
+	echo "Enter Subnet-mask:"
+	read SNMASK
+	sed -i '57s/.*/  option subnet-mask '$SNMASK';/' /etc/dhcp/dhcpd.conf
+	echo "Router IP:"
+	read IPR
+	sed -i '58s/.*/  option routers '$IPR';/' /etc/dhcp/dhcpd.conf
+	echo "Enter Broadcast address:"
+	read BID
+	sed -i '59s/.*/  option broadcast-address '$BID';/' /etc/dhcp/dhcpd.conf
+	sed -i '60s/#  default-lease-time/  default-lease-time/' /etc/dhcp/dhcpd.conf
+	echo "Enter max lease time:"
+	read MXLEASE
+	sed -i '61s/.*/  max-lease-time '$MXLEASE';/' /etc/dhcp/dhcpd.conf
+	sed -i '62s/#}/}/' /etc/dhcp/dhcpd.conf
+
+	systemctl start isc-dhcp-server
+	systemctl enable isc-dhcp-server
+	ufw allow in on $INTERFACE from any port 68 to any port 67 udp
+	systemctl restart isc-dhcp-server
+	systemctl status isc-dhcp-server
 
 }
+
 while  true
 do
 	echo -e "\e[33m#####################################################\e[0m"
@@ -81,6 +124,7 @@ do
 	echo " "
 	echo -e  "\e[38;5;32m#Author: Jitul#\e[0m"
 	echo " "
+
 	echo " "
 	echo -e "\e[31mPlease select your option-\e[0m"
 	echo " "
