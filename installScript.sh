@@ -1,10 +1,7 @@
 #!/bin/bash
-<<<<<<< HEAD
-=======
 update(){
-	sudo apt-get update -y && apt-get upgrade
+	sudo apt-get update -y && apt-get upgrade -y
 	}
->>>>>>> test
 http(){
 	if ! grep -q "^deb .*$the_ppa" /etc/apt/sources.list /etc/apt/sources.list.d/*; then
     		sudo add-apt-repository ppa:ondrej/apache2 -y
@@ -17,29 +14,44 @@ http(){
 
 ftp(){
 	update
-	sudo cp /etc/vsftpd.conf /etc/conf_default
-	#touch /etc/vsftpd.conf
-	apt-get install vsftpd -y
-	systemctl start vsftpd
-	systemctl enable vsftpd
-
-	echo "Enter Username to configure:" 
-	read UNAME
-	sudo useradd -m -c $UNAME -s /bin/bash $UNAME
-	echo "Enter Password for "$UNAME:""
-	read PWD
-	sudo passwd $PWD
-
-#	useradd -m  testuser
-#	password  testuser
-	mkdir /home/$UNAME
+	apt install vsftpd
+	service vsftpd status
+	ufw allow OpenSSH
 	ufw allow 20/tcp
 	ufw allow 21/tcp
-	sed -i '/write_enable/ s/NO/YES' /etc/vsftpd.conf
+	ufw allow 40000:50000/tcp
+	ufw allow 990/tcp
+	ufw enable
+	ufw status
+	
+	echo "Enter Username for FTP:"
+	read UNAME
+	sudo adduser $UNAME
+	sed -i '$a DenyUsers ftpuser' /etc/ssh/sshd_config
+	service sshd restart
+	usermod -d /var/www ftpuser
+	chown ftpuser:ftpuser /var/www/html
+	mv /etc/vsftpd.conf /etc/vsftpd.conf.bak
+
+	echo "listen=NO\n
+	listen_ipv6=YES\n
+	anonymous_enable=NO\n
+	local_enable=YES\n
+	write_enable=YES\n
+	local_umask=022\n
+	dirmessage_enable=YES\n
+	use_localtime=YES\n
+	xferlog_enable=YES\n
+	connect_from_port_20=YES\n
+	chroot_local_user=YES\n
+	secure_chroot_dir=/var/run/vsftpd/empty\n
+	pam_service_name=vsftpd\n
+	force_dot_files=YES\n
+	pasv_min_port=40000\n
+	pasv_max_port=50000\n"> /etc/vsftpd.conf
+
 	systemctl restart vsftpd
 	echo "Installation Done"
-#	echo "Test username is: testuser"
-#	echo "Test login password is: testuser"
 }
 ssh(){	update
 	apt-get install openssh-server
