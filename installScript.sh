@@ -122,7 +122,8 @@ do
 	echo -e "\e[33m#\e[0m            \e[38;5;41mWelcome to Installer Script\e[0m            \e[33m#"
 	echo -e "\e[33m#####################################################\e[0m"
 	echo " "
-	echo -e  "\e[38;5;32m#Author: Jitul#\e[0m"
+	echo -e  "\e[38;5;32m#Author: JitulKumarL#\e[0m"
+	echo -e  "\e[95m#Server Installation Script#\e[0m"
 	echo " "
 
 	echo " "
